@@ -2,8 +2,11 @@ package com.toogood.data.transform;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 
 import com.toogood.data.transform.input.Input;
 import com.toogood.data.transform.input.Source1DtoInputImpl;
@@ -27,8 +30,9 @@ public class Transform {
 
 	/*
 	 * Transform a list of class implement Input interface and return a list of
-	 * OutputDto objects for other part of the system to use
-	 * By reading CompletableFuture from OutputTransformer, all request is running in asynchronously
+	 * OutputDto objects for other part of the system to use By reading
+	 * CompletableFuture from OutputTransformer, all request is running in
+	 * asynchronously
 	 * 
 	 * @param inputList: a list of class implement Input interface needed to be
 	 * transform
@@ -36,22 +40,28 @@ public class Transform {
 	 * @return a list of OutputDto objects contain the transformed input value
 	 */
 	public List<OutputDto> transform(List<Input> inputList) {
-		List<CompletableFuture<OutputDto>> futureOutputList = new ArrayList<>();
+		List<CompletableFuture<Optional<OutputDto>>> futureOutputList = new ArrayList<>();
 		List<OutputDto> outputList = new ArrayList<>();
 
 		for (Input input : inputList) {
-			CompletableFuture<OutputDto> futureOutputDto = OutputTransformer.buildOutput(input);
+			CompletableFuture<Optional<OutputDto>> futureOutputDto = OutputTransformer.buildOutput(input);
 			futureOutputList.add(futureOutputDto);
 		}
-		
-		for(CompletableFuture<OutputDto> future: futureOutputList) {
+
+		for (CompletableFuture<Optional<OutputDto>> future : futureOutputList) {
 			try {
-				outputList.add(future.get());
-			} catch (InterruptedException | ExecutionException e) {
+				if (future != null) {
+					OutputDto outputDto = future.get(10, TimeUnit.SECONDS).orElse(null);
+					
+					if (outputDto != null) {
+						outputList.add(outputDto);
+					}
+				}
+			} catch (InterruptedException | ExecutionException | TimeoutException e) {
 				e.printStackTrace();
 			}
 		}
-		
+
 		return outputList;
 	}
 
@@ -69,9 +79,9 @@ public class Transform {
 
 		input1.setIdentifier("123|AbcCode");
 		input1.setName("My Account");
-		input1.setType("2");
+		input1.setType("10");
 		input1.setOpened("01-01-2018");
-		input1.setCurrency("CD");
+		input1.setCurrency("CDD");
 
 		input2.setIdentifier("456|DefCode");
 		input2.setName("My Account 1");
@@ -86,6 +96,7 @@ public class Transform {
 		input4.setName("My Account 2");
 		input4.setType("RESP");
 		input4.setCurrency("U");
+		input4.setCustodianCode("Code");
 
 		inputList.add(input1);
 		inputList.add(input2);
@@ -98,8 +109,8 @@ public class Transform {
 		outputList = transform.transform(inputList);
 
 		for (OutputDto output : outputList) {
-			if(output != null) {
-				System.out.println(output.toString());	
+			if (output != null) {
+				System.out.println(output.toString());
 			}
 		}
 

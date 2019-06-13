@@ -1,5 +1,7 @@
 package com.toogood.data.transform.output;
 
+import com.toogood.data.transform.validation.ValidateResults;
+
 /*
  * OutputDto contain all generic value that would be used by other part of the system
  * All input classes needed to transform their data to the data in this class
@@ -10,6 +12,7 @@ public class OutputDto {
 	private String type;
 	private String openDate;
 	private String currency;
+	private ValidateResults validateResults;
 	
 	public String getAccountCode() {
 		return (accountCode != null) ? accountCode : "";
@@ -41,6 +44,12 @@ public class OutputDto {
 	public void setCurrency(String currency) {
 		this.currency = currency;
 	}
+	public ValidateResults getValidateResults() {
+		return validateResults;
+	}
+	public void setValidateResults(ValidateResults validateResults) {
+		this.validateResults = validateResults;
+	}
 	
 	/*
 	 * Override the toString() method to display output 
@@ -54,6 +63,10 @@ public class OutputDto {
 		sb.append("Type: " + getType() + "\n");
 		sb.append("Open Date: " + getOpenDate() + "\n");
 		sb.append("Currency: " + getCurrency() + "\n");
+		
+		if(getValidateResults() != null && !getValidateResults().isValid()) {
+			sb.append("Error Message: " + getValidateResults().getErrorMessage() + "\n");
+		}
 		
 		return sb.toString();
 	}

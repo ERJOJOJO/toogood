@@ -1,14 +1,22 @@
 package com.toogood.data.transform.input;
 
+import javax.validation.constraints.NotBlank;
+
 import com.toogood.data.transform.util.Constants.OutputTransformerType;
+import com.toogood.data.transform.validation.constraint.CurrencyConstraint;
 
 /*
  * Class implemented Input interface representing the input from Source 2
  */
 public class Source2DtoInputImpl implements Input {
+	@NotBlank (message = "Name cannot be empty")
 	private String name;
+	@NotBlank (message = "Type cannot be empty")
 	private String type;
+	@NotBlank (message = "Currency cannot be empty")
+	@CurrencyConstraint (message = "Invalid Currency")
 	private String currency;
+	@NotBlank (message = "Custodian Code cannot be empty")
 	private String custodianCode;
 	
 	public String getName() {

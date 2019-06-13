@@ -1,15 +1,27 @@
 package com.toogood.data.transform.input;
 
+import javax.validation.constraints.NotBlank;
+
 import com.toogood.data.transform.util.Constants.OutputTransformerType;
+import com.toogood.data.transform.validation.constraint.CurrencyConstraint;
+import com.toogood.data.transform.validation.constraint.IdentifierConstraint;
+import com.toogood.data.transform.validation.constraint.TypeConstraint;
 
 /*
  * Class implemented Input interface representing the input from Source 1
  */
 public class Source1DtoInputImpl implements Input{
+	@NotBlank (message = "Identifier cannot be empty")
+	@IdentifierConstraint (message = "Identifier need to contain '|'")
 	private String identifier;
+	@NotBlank (message = "Name cannot be empty")
 	private String name;
+	@NotBlank (message = "Type cannot be empty")
+	@TypeConstraint (message = "Invalid Type")
 	private String type;
 	private String opened;
+	@NotBlank (message = "Currency cannot be empty")
+	@CurrencyConstraint (message = "Invalid Currency")
 	private String currency;
 	
 	public String getIdentifier() {
